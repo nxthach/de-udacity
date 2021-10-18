@@ -58,7 +58,7 @@ def drop_tables(session):
             print("Error: Issue dropping table.")
             print(e)
 
-    print("Drop tables successfully.)
+    print("Drop tables successfully.")
 
 
 

@@ -11,7 +11,7 @@ song_user_table_drop = "DROP TABLE IF EXISTS song_user"
 ## song_session
 ##
 song_session_table_create = ("""
-    CREATE TABLE IF NOT EXISTS song_in_session (
+    CREATE TABLE IF NOT EXISTS song_session (
         session_id int, 
         item_in_session int, 
         artist text, 

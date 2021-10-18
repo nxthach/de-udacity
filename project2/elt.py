@@ -16,9 +16,8 @@ def process_event_file(session, filepath):
 
     """
     
-    print('Starting to process input CSV data file...')
+    print('Starting to process data...\n')
     num_lines = 0
-
 
     ### 
     # Process song_session table.
@@ -42,9 +41,8 @@ def process_event_file(session, filepath):
                              float(line[5])))
             num_lines += 1
 
-        # print total lines was process
-        print('Processed lines: ', num_lines)
-        print('Data inserted successfully into song_session table.')
+
+        print('The', num_lines,  'data inserted successfully into song_session table.\n')
 
 
     ### 
@@ -74,9 +72,8 @@ def process_event_file(session, filepath):
                              line[4]))
             num_lines += 1
 
-        # print total lines was process
-        print('Processed lines: ', num_lines)
-        print('Data inserted successfully into artist_in_session table.')
+
+        print('The', num_lines,  'data inserted successfully into artist_session table.\n')
 
 
     ### 
@@ -100,9 +97,8 @@ def process_event_file(session, filepath):
                             line[4]))
             num_lines += 1
             
-        # print total lines was process
-        print('Processed lines: ', num_lines)
-        print('Data inserted successfully into user_and_song table.')
+ 
+        print('The', num_lines,  'data inserted successfully into song_user table.\n')
 
 def process_data(session, filepath, target_file, func):
     """
@@ -145,8 +141,11 @@ def process_data(session, filepath, target_file, func):
     ###
     # Creating event_datafile_new.csv file from list of data 
     ###
+    
+    print("Start write data to", target_file)
+    num_lines = 0
+    
     csv.register_dialect('myDialect', quoting=csv.QUOTE_ALL, skipinitialspace=True)
-
     with open(target_file, 'w', encoding = 'utf8', newline='') as f:
         writer = csv.writer(f, dialect='myDialect')
         writer.writerow(['artist','firstName','gender',
@@ -160,8 +159,10 @@ def process_data(session, filepath, target_file, func):
                              row[4], row[5], row[6], 
                              row[7], row[8], row[12], 
                              row[13], row[16]))
+            num_lines += 1
     
-        
+    print("End write data to", target_file, "with total record", num_lines, '\n')
+    
     ###
     # Read data from event_datafile_new.csv file
     # and insert to table: song_session, artist_session, song_user
