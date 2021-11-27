@@ -65,20 +65,20 @@ staging_songs_table_create = ("""
 
 songplay_table_create = ("""
     CREATE TABLE IF NOT EXISTS songplays (
-        songplay_id SERIAL PRIMARY KEY, 
-        start_time timestamp NOT NULL, 
-        user_id int, 
+        songplay_id INTEGER IDENTITY(0,1) NOT NULL SORTKEY,
+        start_time timestamp NOT NULL,
+        user_id text, 
         level text, 
         song_id text, 
         artist_id text, 
-        session_id int, 
+        session_id INTEGER, 
         location text, 
         user_agent text);
 """)
 
 user_table_create = ("""
     CREATE TABLE IF NOT EXISTS users (
-        user_id int PRIMARY KEY, 
+        user_id text NOT NULL SORTKEY, 
         first_name text, 
         last_name text, 
         gender text, 
@@ -87,7 +87,7 @@ user_table_create = ("""
 
 song_table_create = ("""
     CREATE TABLE IF NOT EXISTS songs (
-        song_id text PRIMARY KEY, 
+        song_id text NOT NULL SORTKEY,
         title text, 
         artist_id text NOT NULL, 
         year int, 
@@ -96,7 +96,7 @@ song_table_create = ("""
 
 artist_table_create = ("""
     CREATE TABLE IF NOT EXISTS artists (
-        artist_id text PRIMARY KEY, 
+        artist_id text NOT NULL SORTKEY,
         name text, 
         location text, 
         latitude numeric, 
@@ -105,12 +105,12 @@ artist_table_create = ("""
 
 time_table_create = ("""
     CREATE TABLE IF NOT EXISTS time (
-        start_time timestamp PRIMARY KEY, 
-        hour int, 
-        day int, 
-        week int, 
-        month int, 
-        year int, 
+        start_time timestamp, 
+        hour INTEGER, 
+        day INTEGER, 
+        week INTEGER, 
+        month INTEGER, 
+        year INTEGER, 
         weekday text);
 """)
 
@@ -138,7 +138,8 @@ staging_songs_copy = ("""
 
 songplay_table_insert = ("""
     INSERT INTO songplays (start_time, user_id, level, song_id, artist_id, session_id, location, user_agent)
-    SELECT  DISTINCT se.ts   AS start_time,
+    SELECT  DISTINCT TIMESTAMP WITH TIME ZONE 'epoch' + se.ts/1000 * INTERVAL '1 second' 
+                             AS start_time,
             se.userId        AS user_id,
             se.level         AS level,
             ss.song_id       AS song_id,
@@ -149,7 +150,6 @@ songplay_table_insert = ("""
     FROM staging_events AS se
     JOIN staging_songs AS ss ON (se.artist = ss.artist_name)
     WHERE se.page = 'NextSong';
-    
 """)
 
 user_table_insert = ("""
@@ -186,8 +186,9 @@ artist_table_insert = ("""
 """)
 
 time_table_insert = ("""
-    INSERT INTO time ( start_time, hour, day, week, month, year, weekday)
-    SELECT DISTINCT se.ts                   AS start_time,
+    INSERT INTO time (start_time, hour, day, week, month, year, weekday)
+    SELECT DISTINCT TIMESTAMP WITH TIME ZONE 'epoch' + se.ts/1000 * INTERVAL '1 second'
+                                            AS start_time,
            EXTRACT(hour FROM start_time)    AS hour,
            EXTRACT(day FROM start_time)     AS day,
            EXTRACT(week FROM start_time)    AS week,
