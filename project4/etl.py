@@ -19,6 +19,11 @@ os.environ['AWS_SECRET_ACCESS_KEY']=config['AWS']['AWS_SECRET_ACCESS_KEY']
 
 
 def create_spark_session():
+    
+    """
+    Start create SparkSession. 
+    """
+    
     print("Start create SparkSession.")
     
     spark = SparkSession \
@@ -32,14 +37,20 @@ def create_spark_session():
 
 def process_song_data(spark, input_data, output_data):
     
+    """
+    Load input data (song_data) from S3,
+    process the data to extract song_table and artists_table, 
+    and store  to S3 as parquet files.
+    """
+    
     #
     #=== READ SONG DATA FILE FROM S3 ===
     #
 
     print("Start processing song_data JSON files...")
     # get filepath to song data file
-    song_data = input_data + "song_data/A/A/A/*.json"
-    #song_data = input_data + "song_data/*/*/*/*.json"
+    #song_data = input_data + "song_data/A/A/A/*.json"
+    song_data = input_data + "song_data/*/*/*/*.json"
     
     
     # read song data file
@@ -111,6 +122,12 @@ def process_song_data(spark, input_data, output_data):
 
 
 def process_log_data(spark, input_data, output_data):
+    
+    """
+    Load input data (log_data) from S3,
+    process the data to extract users_table, time_table, songplays_table
+    and store to S3 as parquet files.
+    """
 
     #
     #=== READ LOG DATA FILE FROM S3 ===
@@ -119,8 +136,8 @@ def process_log_data(spark, input_data, output_data):
     print("Start processing log_data JSON files...")
 
     # get filepath to log data file
-    log_data = input_data + "log_data/2018/11/*.json"
-    # log_data = input_data + "log_data/*/*/*.json"
+    # log_data = input_data + "log_data/2018/11/*.json"
+    log_data = input_data + "log_data/*/*/*.json"
 
     # read log data file
     logdata_df = spark.read.json(log_data)
@@ -201,11 +218,11 @@ def process_log_data(spark, input_data, output_data):
     print("Start write time_table.")
 
     time_table_out_path = output_data + "time_table.parquet"
-    #time_table.write.partitionBy("year", "month").mode("overwrite").parquet(time_table_out_path)
+    time_table.write.partitionBy("year", "month").mode("overwrite").parquet(time_table_out_path)
     
-    #
-    time_table2 = time_table.limit(5)
-    time_table2.write.partitionBy("year", "month").mode("overwrite").parquet(time_table_out_path)
+    # Uncomment to run faster in case test
+    # time_table2 = time_table.limit(5)
+    # time_table2.write.partitionBy("year", "month").mode("overwrite").parquet(time_table_out_path)
 
     print("End write time_table.")
 
@@ -271,6 +288,14 @@ def process_log_data(spark, input_data, output_data):
     print("End processing log_data JSON files!")
 
 def main():
+    
+    """
+    Load input data (song_data and log_data) as JSON from S3,
+    process the data to extract songs_table, artists_table,
+    users_table, time_table, songplays_table,
+    and store back to  S3 as parquet files.
+    """
+    
     spark = create_spark_session()
     input_data = "s3a://udacity-dend/"    
     output_data = config['AWS']['OUTPUT_DATA']
