@@ -1,0 +1,13 @@
+Endpoint
+    redshift-airflow-1.c2qqeljdywgt.us-west-2.redshift.amazonaws.com
+
+Port
+    5439
+
+DB
+    dev
+
+username/password
+    awsuser/AdminPass123
+
+    
