@@ -18,40 +18,37 @@ class LoadDimensionOperator(BaseOperator):
                  redshift_conn_id="",
                  table_target="",
                  table_select="",
-                 truncate=False,
+                 truncateData=False,
                  *args, **kwargs):
 
         super(LoadDimensionOperator, self).__init__(*args, **kwargs)
         self.redshift_conn_id = redshift_conn_id
         self.table_target = table_target
         self.table_select = table_select
-        self.truncate = truncate
+        self.truncateData = truncateData
 
     def execute(self, context):
-        # Acquire redshift connection
-        self.log.info("Acquiring redshift connection")
         
+        self.log.info("Get redshift connection")
         redshift = PostgresHook(postgres_conn_id=self.redshift_conn_id)
         
-        # Truncate the target table if Truncate=True
-#         self.log.info("Truncate mode: {}".format(self.truncate))
-#         if self.truncate:
-#             delete_query = "DELETE FROM {}".format(self.table)
-#             self.log.info("Start truncating table: {}".format(self.table))
-#             redshift.run(delete_query)
-#             self.log.info("End truncating table: {}".format(self.table))
+        # Truncate the target table if truncateData=True
+        self.log.info(f"truncateData: {self.truncateData}")
+        if self.truncateData:            
+            self.log.info(f"Start truncating table: {self.table_target}")
+            
+            delete_query = "DELETE FROM {}".format(self.table_target)
+            redshift.run(delete_query)
+            
+            self.log.info(f"End truncating table: {self.table_target}")
 
-        # Run query to load the table
-        self.log.info("Start inserting table: {}".format(self.table_target))
-        
-#         select_query = getattr(SqlQueries, "{}_table_query".format(self.table))
-
-        
+        # Run query to load data to table
         sql_table_select = getattr(SqlQueries, self.table_select)
         sql_insert = self.insert_template.format(self.table_target, sql_table_select)
+        self.log.info(f"sql_insert: {sql_insert}".format(sql_insert))
         
-        self.log.info("sql_insert: {}".format(sql_insert))
+        self.log.info(f"Start inserting table: {self.table_target}")
         
         redshift.run(sql_insert)
         
-        self.log.info("End inserting table: {}".format(self.table_target))
+        self.log.info(f"End inserting table: {self.table_target}")

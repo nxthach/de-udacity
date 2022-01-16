@@ -49,7 +49,6 @@ class SqlQueries:
     ### 1. songplays
     
     # check null
-    
     songplays_check_nulls = ("""
         SELECT COUNT(*)
         FROM songplays
@@ -59,15 +58,74 @@ class SqlQueries:
               OR sessionid IS NULL;
     """)
     
-    # check have data or not for
+    # count number of data was saved
+    songplays_check_count = ("""
+        SELECT COUNT(*)
+        FROM songplays;
+    """)
     
     
-    ### 2. users
+    ### 2. users ###
+    
     # check null
+    users_check_nulls = ("""
+        SELECT COUNT(*)
+        FROM users
+        WHERE userid IS NULL;
+    """)
     
-    ### 3. songs
-    ### 4. artists
-    ### 5. time
+    # count number of data was saved
+    users_check_count = ("""
+        SELECT COUNT(*)
+        FROM users;
+    """)
+    
+    ### 3. songs ###
+    
+    # check null
+    songs_check_nulls = ("""
+        SELECT COUNT(*)
+        FROM songs
+        WHERE songid IS NULL;
+    """)
+    
+    # count number of data was saved
+    songs_check_count = ("""
+        SELECT COUNT(*)
+        FROM songs;
+    """)
+    
+     ### 4. artists ###
+    
+    # check null
+    artists_check_nulls = ("""
+        SELECT COUNT(*)
+        FROM artists
+        WHERE artistid IS NULL;
+    """)
+    
+    # count number of data was saved
+    artists_check_count = ("""
+        SELECT COUNT(*)
+        FROM artists;
+    """)
+    
+    ### 5. time ###
+    
+    # check null
+    time_check_nulls = ("""
+        SELECT COUNT(*)
+        FROM time
+        WHERE start_time IS NULL;
+    """)
+    
+    # count number of data was saved
+    time_check_count = ("""
+        SELECT COUNT(*)
+        FROM time;
+    """)
+    
+    
     
     
     

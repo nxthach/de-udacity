@@ -7,11 +7,10 @@ class StageToRedshiftOperator(BaseOperator):
     ui_color = '#358140'
     
     
-    # templated fields
     template_fields = ("s3_key",)
 
-    # redshift copy query
-    copy_sql = """
+    # sql to copy data to redshift
+    copy_sql_template = """
         COPY {}
         FROM '{}'
         JSON '{}'
@@ -41,31 +40,33 @@ class StageToRedshiftOperator(BaseOperator):
         
 
     def execute(self, context):
-        self.log.info("Acquiring aws hook")
+        self.log.info("Get aws hook")
         aws_hook = AwsHook(self.aws_credentials_id)
         
         self.log.info("Getting aws credentials")
         credentials = aws_hook.get_credentials()
         
-        self.log.info("Acquiring redshift connection")
+        self.log.info("Get redshift connection")
         redshift = PostgresHook(postgres_conn_id=self.redshift_conn_id)
 
-        # Wipe out data before copying
+        # Clear data before insert
         self.log.info(f"Start clearing data from table {self.table}")
         redshift.run("DELETE FROM {}".format(self.table))
         self.log.info(f"End clearing data from table {self.table}")
             
         # Copy from s3 to redshift
         self.log.info(f"Start copying data from S3 to table {self.table}")
+        
         s3_path = "s3://{}/{}".format(self.s3_bucket, self.s3_key)
-        formatted_sql = StageToRedshiftOperator.copy_sql.format(
+        
+        copy_sql = StageToRedshiftOperator.copy_sql_template.format(
             self.table,
             s3_path,
             self.json_option,
             credentials.access_key,
             credentials.secret_key
         )
-        redshift.run(formatted_sql)
+        redshift.run(copy_sql)
         self.log.info(f"End copying data from S3 to table {self.table}")
 
 
